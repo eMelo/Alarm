@@ -111,9 +111,16 @@ int CheckKeyboard(int digit)
             row = CheckRow();
             if(row)
             {
-                checker[pos] = Keyboard[row-1][col];
-                pos++;
-                x = 0;
+                if(row == 4)
+                    if(pos > 0)
+                        pos--;
+
+                else
+                {
+                    checker[pos] = Keyboard[row-1][col];
+                    pos++;
+                    x = 0;
+                }
             }
         }
 
@@ -150,9 +157,15 @@ int CheckKeyboard(int digit)
             row = CheckRow();
             if(row)
             {
-                checker[pos] = Keyboard[row-1][col];
-                pos++;
-                x = 0;
+                if(pos == 4)
+                    pos = 0;
+                
+                else
+                {
+                    checker[pos] = Keyboard[row-1][col];
+                    pos++;
+                    x = 0;
+                }
             }
         }
         PORTAbits.RA5 = 0;
