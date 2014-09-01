@@ -5,6 +5,7 @@
 #include <xc.h>
 #include "Keyboard.h"
 
+void UartConfig(void);
 #define ACTIVADA PORTAbits.RA0
 #define DISPONIBLE PORTAbits.RA1
 #define SOUND PORTEbits.RE2
@@ -34,24 +35,6 @@ union Areas
         unsigned  char all;
     };
 }Sensor_Area;
-
-void UartConfig(void)
-{
-    TRISCbits.RC6 = 1;
-    TRISCbits.RC7 = 1;
-    SPBRG   = 51; //51  25
-    TXSTA   = 0b00100100;
-    RCSTA   = 0b10010000;
-    BAUDCON = 0b00000000;
-
-    PIE1bits.RCIE = 1;
-    IPR1bits.RCIP = 1;
-
-    OSCCONbits.IRCF0 = 1;
-    OSCCONbits.IRCF1 = 1;
-    OSCCONbits.IRCF2 = 1;
-
-}
 
 int passCheck(void)
 {

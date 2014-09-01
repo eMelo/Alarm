@@ -1,64 +1,30 @@
-//Old Main
- #if(0)
-int main()
+#include <pic18f4550.h>
+
+void UartConfig(void)
 {
-    /*Configuracion de Columnas del Teclado*/
-    TRISAbits.RA2 = 0;
-    TRISAbits.RA3 = 0;
-    TRISAbits.RA4 = 0;
-    TRISAbits.RA5 = 0;
+    //COnfiguracion de los Puertos
+    TRISCbits.RC6 = 1;
+    TRISCbits.RC7 = 1;
 
-    /*Configuracion de las Filas del Teclado*/
-    TRISBbits.RB4 = 1;
-    TRISBbits.RB5 = 0; //Poner en 1
-    TRISBbits.RB6 = 1;
-    TRISBbits.RB7 = 1;
+    SPBRGH  = 0;
+    SPBRG   = 16;
 
-    //PORTBbits.RB5 ^= 1;
-    /*Leds Indicadores de Status*/
-    TRISAbits.RA0 = 0;  //Activada
-    TRISAbits.RA1 = 0;  //Disponible
+    TXSTAbits.TXEN = 1; //transmition enable
+    TXSTAbits.BRGH = 1; //High Speed Baud Rate
 
-    UartConfig();
-    /*Uso del Puerto D Para Deteccion de las Areas*/
-    TRISD = 0xFF;
+    RCSTAbits.SPEN = 1; //Serial Por Enable
+    RCSTAbits.CREN = 1;
 
-    while(1)
-    {
-        PORTBbits.RB5  ^= 1;
-        int go = 0;
-        while(!go)
-        {
-            datax[0] = 's';
-            datax[1] = 'c';
-            datax[3] = ';';
-            writeTX(3);
-            if(PIR1bits.RCIF)
-            {
-                if(RCREG == 'E' || RCREG == 'e')
-                    go = 0;
-                else if(RCREG == 'O' || RCREG == 'o')
-                    go = 1;
-            }
-        }
-        if(PORTD == 0xFF)
-            DISPONIBLE = 1;
-        else
-        {
-            DISPONIBLE = 0;
-            CheckArea();
-            //Desplegar Por UART El area
-            /*Proceso*/
+    BAUDCONbits.BRG16 = 1;
 
-            //Introducir el Codigo
-            if(CheckKeyboard(4))
-            {
-                ;
-            }
-            //Introducir Accion
-            CheckKeyboard(1);
-        }
-    }
-    return 0;
+    //Para el Registro de Recepcion
+    PIE1bits.RCIE = 1;
+    IPR1bits.RCIP = 1;
+
+    //8Mhz
+    OSCCONbits.IRCF0 = 1;
+    OSCCONbits.IRCF1 = 1;
+    OSCCONbits.IRCF2 = 1;
+
 }
-#endif
+
