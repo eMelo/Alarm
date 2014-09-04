@@ -159,9 +159,16 @@ int CheckKeyboard(int digit)
     }
 }
 
+char UART_Read()
+{
+    //1249
+  while(!RCIF); //Waits for Reception to complete
+  return RCREG; //Returns the 8 bit data
+}
+
 void sendTX(char data)
 {
-    while(!TXSTAbits.TRMT);
+    while(!TRMT);
     TXREG = data;
 }
 
@@ -175,6 +182,13 @@ void writeTX(int len)
     }
 }
 
+void test(void)
+{
+    int x = 0;
+    char send1[] = "sb0;";
+    while(x < 4)
+        sendTX(send1[x++]);
+}
 int main()
 {
     /*Configuracion de Columnas del Teclado*/
@@ -199,6 +213,15 @@ int main()
     
     /*Uso del Puerto D Para Deteccion de las Areas*/
     TRISD = 0xFF;
+
+    //Configuracion del Uart
+    UartConfig();
+    while(1)
+    {
+        test();
+        char test;
+        //test = UART_Read();
+    }
 
     while(1)
     {
