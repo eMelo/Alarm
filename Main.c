@@ -185,9 +185,15 @@ void writeTX(int len)
 void test(void)
 {
     int x = 0;
-    char send1[] = "sb0;";
+    /*
+    char send1[] = "sb1;";
     while(x < 4)
         sendTX(send1[x++]);
+     * */
+
+    char send2[] = "ssMELO;";
+    while(x < 7)
+        sendTX(send2[x++]);
 }
 int main()
 {

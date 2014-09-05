@@ -3,8 +3,7 @@
 
 void UartConfig(void)
 {
-    SPBRG   = 1249;  //25 -> 115200
-                     //1249 --> 9600
+    SPBRG   = 51;  //8MHZ --> 9600 BaudRate
 
     BAUDCON = 0;
 
@@ -24,13 +23,13 @@ void UartConfig(void)
     IPR1bits.RCIP = 1;
 
     //8Mhz
-    /*
+    
     OSCCONbits.IRCF0 = 1;
     OSCCONbits.IRCF1 = 1;
     OSCCONbits.IRCF2 = 1;
     
     OSCCONbits.SCS1 = 1;
     OSCCONbits.SCS0 = 1;
-    */
+    
 }
 
