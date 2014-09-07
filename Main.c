@@ -6,6 +6,11 @@
 #include "Keyboard.h"
 
 void UartConfig(void);
+void writeTX(char *data,int len);
+void sendTX(char data);
+char UART_Read();
+void timerConfig(void);
+
 #define ACTIVADA PORTAbits.RA0
 #define DISPONIBLE PORTAbits.RA1
 #define SOUND PORTEbits.RE2
@@ -14,7 +19,6 @@ void UartConfig(void);
 const int MaxCount = 8000;
 const int KeyDelay = 8000;
 unsigned char password[]="6691", checker[5];
-char datax[20];
 unsigned char Keyboard[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
 
 union Areas
@@ -48,6 +52,17 @@ int passCheck(void)
 void CheckArea(void)
 {
     Sensor_Area.all = PORTD;
+    writeTX("sd0,0;",6);
+    writeTX("ssSUPERVISAR AREAS;",19);
+    writeTX("sd1,0;",6);
+    Sensor_Area.Sala == 0           ? writeTX("ss 1;",5): writeTX("ss  ;",5);
+    Sensor_Area.Terraza == 0        ? writeTX("ss 2;",5): writeTX("ss  ;",5);
+    Sensor_Area.Galeria == 0        ? writeTX("ss 3;",5): writeTX("ss  ;",5);
+    Sensor_Area.Bocina == 0         ? writeTX("ss 4;",5): writeTX("ss  ;",5);
+    Sensor_Area.Sensor == 0         ? writeTX("ss 5;",5): writeTX("ss  ;",5);
+    Sensor_Area.Inversor == 0       ? writeTX("ss 6;",5): writeTX("ss  ;",5);
+    Sensor_Area.CuartoPapi == 0     ? writeTX("ss 7;",5): writeTX("ss  ;",5);
+    Sensor_Area.CuartoHermanos == 0 ? writeTX("ss 8;",5): writeTX("ss  ;",5);
 }
 
 int CheckRow(void)
@@ -159,42 +174,6 @@ int CheckKeyboard(int digit)
     }
 }
 
-char UART_Read()
-{
-    //1249
-  while(!RCIF); //Waits for Reception to complete
-  return RCREG; //Returns the 8 bit data
-}
-
-void sendTX(char data)
-{
-    while(!TRMT);
-    TXREG = data;
-}
-
-void writeTX(int len)
-{
-    int x = 0;
-    while(x<len)
-    {
-        sendTX(datax[x]);
-        x++;
-    }
-}
-
-void test(void)
-{
-    int x = 0;
-    /*
-    char send1[] = "sb1;";
-    while(x < 4)
-        sendTX(send1[x++]);
-     * */
-
-    char send2[] = "ssMELO;";
-    while(x < 7)
-        sendTX(send2[x++]);
-}
 int main()
 {
     /*Configuracion de Columnas del Teclado*/
@@ -218,21 +197,20 @@ int main()
     TRISEbits.RE2 = 0;
     
     /*Uso del Puerto D Para Deteccion de las Areas*/
+    PORTD = 0;
     TRISD = 0xFF;
 
     //Configuracion del Uart
     UartConfig();
-    while(1)
-    {
-        test();
-        char test;
-        //test = UART_Read();
-    }
 
     while(1)
     {
         if(ACTIVADA == 1)
         {
+            writeTX("sd0,0;",6);
+            writeTX("ss   INTRODUCIR   ;",19);
+            writeTX("sd1,0;",6);
+            writeTX("ss     CODIGO     ;",19);
             //En este caso la Alarma esta Activada
             CheckKeyboard(4);   //Tomo 4 digitos correspondites a la Clave
             //Chequeo el Password
@@ -242,6 +220,10 @@ int main()
                 while(try < 5 && out < KeyDelay)
                 {
                     //Hasta un numero de Intnetos X, y un tiempo determinado
+                    writeTX("sd0,0;",6);
+                    writeTX("ss   INTRODUCIR   ;",19);
+                    writeTX("sd1,0;",6);
+                    writeTX("ss     ACCION     ;",19);
                     if(CheckKeyboard(1))
                     {
                         //Desactivar
@@ -262,25 +244,29 @@ int main()
             {
                 SOUND = 1;
                 //UART MOSTRAR EL AREA DONDE FUE ACTIVADA
+                CheckArea();
             }
         }
         else if(ACTIVADA == 0)
         {
             SOUND = 0;
             //En este caso la alarma esta desativada
+            
             if(PORTD == 0xFF)
-                DISPONIBLE = 1;
-
-            else
             {
-                DISPONIBLE = 0;
-                CheckArea();
-                //Desplegar Por UART El area
-                /*Proceso*/
+                DISPONIBLE = 1;
+                writeTX("sd0,0;",6);
+                writeTX("ss   INTRODUCIR   ;",19);
+                writeTX("sd1,0;",6);
+                writeTX("ss     CODIGO     ;",19);
 
                 //Introducir el Codigo
                 if(CheckKeyboard(4))
                 {
+                    writeTX("sd0,0;",6);
+                    writeTX("ss   INTRODUCIR   ;",19);
+                    writeTX("sd1,0;",6);
+                    writeTX("ss     ACCION     ;",19);
                     //Introducir Accion
                     if(CheckKeyboard(1))
                     {
@@ -299,7 +285,15 @@ int main()
                             ACTIVADA = 0;
                         }
                     }
-                }   
+                }
+            }
+
+            else
+            {
+                DISPONIBLE = 0;
+                CheckArea();
+                //Desplegar Por UART El area
+                /*Proceso*/
             }
         }
     }
