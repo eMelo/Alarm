@@ -176,16 +176,36 @@ int CheckKeyboard(int digit)
 
 int main()
 {
-    //Configuracion de Puertos
-    portConfig();
+    /*Configuracion de Columnas del Teclado*/
+    TRISAbits.RA2 = 0;
+    TRISAbits.RA3 = 0;
+    TRISAbits.RA4 = 0;
+    TRISAbits.RA5 = 0;
+
+    /*Configuracion de las Filas del Teclado*/
+    TRISBbits.RB4 = 1;
+    TRISBbits.RB5 = 1;
+    TRISBbits.RB6 = 1;
+    TRISBbits.RB7 = 1;
+
+    /*Leds Indicadores de Status*/
+    TRISAbits.RA0 = 0;  //Activada
+    TRISAbits.RA1 = 0;  //Disponible
+
+    /*Puerto INdicador de SOnido*/
+    PORTEbits.RE2 = 0;
+    TRISEbits.RE2 = 0;
+    
+    /*Uso del Puerto D Para Deteccion de las Areas*/
+    PORTD = 0;
+    TRISD = 0xFF;
 
     //Configuracion del Uart
     UartConfig();
 
     //Configuracion del TIMER
     timerConfig();
-    PORTA = 0xFF;
-    LATA = 0xFF;
+
     while(1)
     {
         if(ACTIVADA == 1)
