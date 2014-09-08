@@ -73,8 +73,36 @@ void writeTX(char *data,int len)
             out = 1;
     }
 }
+
 void timerConfig(void)
 {
     T0CON = 0b10000111;
     TMR0 = 0;
+}
+
+void portConfig(void)
+{
+     /*Configuracion de Columnas del Teclado*/
+    TRISAbits.RA2 = 0;
+    TRISAbits.RA3 = 0;
+    TRISAbits.RA4 = 0;
+    TRISAbits.RA5 = 0;
+
+    /*Configuracion de las Filas del Teclado*/
+    TRISBbits.RB4 = 1;
+    TRISBbits.RB5 = 1;
+    TRISBbits.RB6 = 1;
+    TRISBbits.RB7 = 1;
+
+    /*Leds Indicadores de Status*/
+    TRISAbits.RA0 = 0;  //Activada
+    TRISAbits.RA1 = 0;  //Disponible
+
+    /*Puerto INdicador de SOnido*/
+    PORTEbits.RE2 = 0;
+    TRISEbits.RE2 = 0;
+
+    /*Uso del Puerto D Para Deteccion de las Areas*/
+    PORTD = 0;
+    TRISD = 0xFF;
 }
