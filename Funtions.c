@@ -1,6 +1,6 @@
 #include <pic18f4550.h>
 #include <xc.h>
-const int DelayCount = 8000;
+const int DelayCount = 300; //10 Segundos  --> un segundo = 30 conteos
 void UartConfig(void)
 {
     SPBRG   = 51;  //8MHZ --> 9600 BaudRate
@@ -35,9 +35,10 @@ void UartConfig(void)
 
 char UART_Read()
 {
-    int y = 0;
-    while(!RCIF && y < DelayCount) //Waits for Reception to complete
-        y++;
+    if(TMR0 > 65000)
+        TMR0 = 0;
+    int y = TMR0;
+    while(!RCIF && ((TMR0-y) < DelayCount)); //Waits for Reception to complete
     if(y == DelayCount || RCREG == 'E' || RCREG == 'e')
         return 'N';
     return RCREG; //Returns the 8 bit data
@@ -45,9 +46,10 @@ char UART_Read()
 
 void sendTX(char data)
 {
-    int z = 0;
-    while(!TRMT && z < DelayCount)
-        z++;
+    if(TMR0 > 65000)
+        TMR0 = 0;
+    int z = TMR0;
+    while(!TRMT && ((TMR0-z) < DelayCount));  //Waits for Transmition to complete
     TXREG = data;
 }
 
@@ -58,7 +60,7 @@ void writeTX(char *data,int len)
     {
         while(x<len)
         {
-            sendTX(data[x]);
+            sendTX(*(data+x));
             x++;
         }
         char reader = UART_Read();
@@ -73,5 +75,6 @@ void writeTX(char *data,int len)
 }
 void timerConfig(void)
 {
-
+    T0CON = 0b10000111;
+    TMR0 = 0;
 }

@@ -203,6 +203,9 @@ int main()
     //Configuracion del Uart
     UartConfig();
 
+    //Configuracion del TIMER
+    timerConfig();
+
     while(1)
     {
         if(ACTIVADA == 1)
