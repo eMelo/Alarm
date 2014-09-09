@@ -20,6 +20,7 @@ const int MaxCount = 8000;
 const int KeyDelay = 8000;
 unsigned char password[]="6691", checker[5];
 unsigned char Keyboard[4][4] = {{'1','2','3','A'},{'4','5','6','B'},{'7','8','9','C'},{'*','0','#','D'}};
+unsigned char lastState;
 
 union Areas
 {
@@ -176,6 +177,7 @@ int CheckKeyboard(int digit)
 
 int main()
 {
+    lastState = PORTD;
     //Configuracion de Puertos
     portConfig();
 
@@ -184,31 +186,40 @@ int main()
 
     //Configuracion del TIMER
     timerConfig();
-    PORTA = 0xFF;
-    LATA = 0xFF;
+
     while(1)
     {
+        int AccionUno = 0;
         if(ACTIVADA == 1)
         {
-            writeTX("sd0,0;",6);
-            writeTX("ss   INTRODUCIR   ;",19);
-            writeTX("sd1,0;",6);
-            writeTX("ss     CODIGO     ;",19);
+            if(!AccionUno)
+            {
+                writeTX("sd0,0;",6);
+                writeTX("ssINTRODUCIR CLAVE;",19);
+                writeTX("sd1,0;",6);
+                AccionUno++;
+            }
             //En este caso la Alarma esta Activada
             CheckKeyboard(4);   //Tomo 4 digitos correspondites a la Clave
             //Chequeo el Password
             if(passCheck())
             {
-                int try = 0, out = 0;
+                AccionUno = 0;
+                int try = 0, out = 0, AccionDos = 0;
                 while(try < 5 && out < KeyDelay)
                 {
                     //Hasta un numero de Intnetos X, y un tiempo determinado
-                    writeTX("sd0,0;",6);
-                    writeTX("ss   INTRODUCIR   ;",19);
-                    writeTX("sd1,0;",6);
-                    writeTX("ss     ACCION     ;",19);
+                    if(!AccionDos)
+                    {
+                        writeTX("sd0,0;",6);
+                        writeTX("ss   INTRODUCIR   ;",19);
+                        writeTX("sd1,0;",6);
+                        writeTX("ss     ACCION     ;",19);
+                        AccionDos++;
+                    }
                     if(CheckKeyboard(1))
                     {
+                        AccionDos = 0;
                         //Desactivar
                         if(checker[0] == 'D')
                         {
@@ -230,7 +241,7 @@ int main()
                 CheckArea();
             }
         }
-        else if(ACTIVADA == 0)
+        else if(ACTIVADA == 0 || DISPONIBLE == 1)
         {
             SOUND = 0;
             //En este caso la alarma esta desativada
@@ -274,9 +285,15 @@ int main()
             else
             {
                 DISPONIBLE = 0;
-                CheckArea();
-                //Desplegar Por UART El area
-                /*Proceso*/
+                if(lastState != PORTD && PORTD != 0xFF)
+                {
+                    CheckArea();
+                    lastState != PORTD;
+                    //Desplegar Por UART El area
+                    /*Proceso*/
+                }
+                else
+                    DISPONIBLE = 1;
             }
         }
     }
